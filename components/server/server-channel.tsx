@@ -5,7 +5,7 @@ import { Channel, ChannelType, MemberRole, Server } from "@prisma/client";
 import { Edit, Hash, Lock, Mic, Trash, Video } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import ActionTooltip from "../action-tooltip";
-import { useModal } from "@/hooks/use-modal-store";
+import { ModalType, useModal } from "@/hooks/use-modal-store";
 
 interface ServerChannelProps {
    channel: Channel;
@@ -27,8 +27,18 @@ const ServerChannel = ({ channel, server, role }: ServerChannelProps) => {
 
    const Icon = iconMap[channel.type];
 
+   const onClick = () => {
+      router.push(`/servers/${params?.serverId}/channels/${channel.id}`);
+   };
+
+   const onAction = (e: React.MouseEvent, action: ModalType) => {
+      e.stopPropagation();
+      onOpen(action, { server, channel });
+   };
+
    return (
       <button
+         onClick={onClick}
          className={cn(
             "group p-2 rounded-md flex items-center gap-x-2 w-full hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1",
             params?.channelId === channel.id &&
@@ -49,15 +59,13 @@ const ServerChannel = ({ channel, server, role }: ServerChannelProps) => {
             <div className="ml-auto flex items-center gap-x-2">
                <ActionTooltip lable="Edit">
                   <Edit
-                     onClick={() => onOpen("editChannel", { server, channel })}
+                     onClick={(e) => onAction(e, "editChannel")}
                      className="hidden group-hover:block w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-300 transition"
                   />
                </ActionTooltip>
                <ActionTooltip lable="Delete">
                   <Trash
-                     onClick={() =>
-                        onOpen("deleteChannel", { server, channel })
-                     }
+                     onClick={(e) => onAction(e, "deleteChannel")}
                      className="hidden group-hover:block w-4 h-4 text-rose-500 hover:text-rose-600 dark:text-rose-500 transition"
                   />
                </ActionTooltip>
