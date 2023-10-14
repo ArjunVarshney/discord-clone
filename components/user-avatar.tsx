@@ -1,3 +1,5 @@
+"use client";
+
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { Avatar } from "./ui/avatar";
 import { cn } from "@/lib/utils";
