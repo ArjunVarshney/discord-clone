@@ -5,10 +5,13 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Plus, Smile } from "lucide-react";
+import { Plus, SendHorizontal } from "lucide-react";
 import queryString from "query-string";
 import axios from "axios";
 import { useModal } from "@/hooks/use-modal-store";
+import EmojiPicker from "../emoji-picker";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 interface ChatInputProps {
    apiUrl: string;
@@ -22,6 +25,7 @@ const formSchema = z.object({
 });
 
 const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
+   const router = useRouter();
    const { onOpen } = useModal();
    const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
@@ -40,6 +44,9 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
          });
 
          await axios.post(url, values);
+
+         form.reset();
+         router.refresh();
       } catch (error) {
          console.log(error);
       }
@@ -54,13 +61,13 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                render={({ field }) => (
                   <FormItem>
                      <FormControl>
-                        <div className="relative p-4 pb-6">
+                        <div className="relative p-4 pb-6 flex items-center space-x-2">
                            <button
                               type="button"
                               onClick={() => {
                                  onOpen("messageFile", { apiUrl, query });
                               }}
-                              className="absolute top-7 left-8 h-[24px] w-[24px] bg-zinc-500 dark:bg-zinc-400 hover:bg-zinc-600 dark:hover:bg-zinc-300 transition rounded-full p-1 flex items-center justify-center"
+                              className="absolute top-7 left-10 h-[24px] w-[24px] bg-zinc-500 dark:bg-zinc-400 hover:bg-zinc-600 dark:hover:bg-zinc-300 transition rounded-full p-1 flex items-center justify-center"
                            >
                               <Plus className="text-white dark:text-[#313338]" />
                            </button>
@@ -70,11 +77,23 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                               placeholder={`Message ${
                                  type === "conversation" ? name : "#" + name
                               }`}
+                              autoComplete="off"
                               {...field}
                            />
-                           <div className="absolute top-7 right-8">
-                              <Smile />
+                           <div className="absolute top-7 right-24 flex gap-x-3 items-center justify-center">
+                              <EmojiPicker
+                                 onChange={(emoji: string) =>
+                                    field.onChange(`${field.value}${emoji}`)
+                                 }
+                              />
                            </div>
+                           <Button
+                              disabled={isLoading}
+                              type="submit"
+                              className="h-[24px] py-6 px-4 bg-indigo-500 text-white hover:bg-indigo-400 active:bg-indigo-500"
+                           >
+                              <SendHorizontal />
+                           </Button>
                         </div>
                      </FormControl>
                   </FormItem>
