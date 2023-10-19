@@ -55,10 +55,10 @@ const ChatItem = ({
    socketUrl,
    socketQuery,
 }: ChatItemProps) => {
-   const onMemberClick = () => {
-      const router = useRouter();
-      const params = useParams();
+   const router = useRouter();
+   const params = useParams();
 
+   const onMemberClick = () => {
       if (member.id === currentMember.id) {
          return;
       }
